@@ -1,0 +1,8 @@
+{
+  "TEM": {
+    "root": true,
+    "time": ["reCALL", "reFINAL", "TIME"],
+    "geo": ["O12"],
+    "status": "active"
+  }
+}
