@@ -2,107 +2,65 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>GHOST-SCAN – Systemlage</title>
+<title>3hit90 – SYS ROOT</title>
 
 <style>
-  body { font-family: Arial; background:#111; color:#eee; }
-  h1 { text-align:center; }
-  .respo-box {
-    border:1px solid #444;
-    padding:10px;
-    margin:10px;
-    background:#222;
-  }
-  .ok { color:#00ff88; }
-  .help { color:#ffcc00; }
-  .error { color:#ff4444; }
+body { background:#000; color:#0f0; font-family:Consolas, monospace; padding:20px; }
+h1, h2 { color:#6cf; }
+a { color:#6cf; display:block; margin:10px 0; font-size:18px; }
+hr { border:1px solid #333; margin:25px 0; }
+pre { background:#111; padding:12px; border:1px solid #333; }
 </style>
-</head>
 
+</head>
 <body>
 
-<h1>GHOST‑SCAN – Systemlage</h1>
+<h1>3hit90 – SYS ROOT</h1>
+<p>TΩ + XU + Φ4 + O12 → System‑Fusion</p>
 
-<div id="output"></div>
+<hr>
 
-<script src="/fin.e.js"></script>
+<h2>Geometrie‑Systeme</h2>
+<a href="./visual/o12.html">O12 – Morphing Geometry Engine</a>
+<a href="./visual/o12.html">TΩ – Tetraeder + Oktagon</a>
+<a href="./visual/o12.html">XU – Achsenkreuz + Unified Core</a>
+<a href="./visual/o12.html">Φ4 – Vierfach‑Achsenfamilie</a>
 
-<script>
-// ------------------------------------------------------
-// RESPO-Liste (ALLE Cluster)
-// ------------------------------------------------------
-const RESPO_NAMES = [
-  "AIR",
-  "boerse",
-  "markt3",
-  "HOME",
-  "USE",
-  "ACSH",
-  "REAL",
-  "BIL",
-  "DU",
-  "NG"
-];
+<hr>
 
-// ------------------------------------------------------
-// Loader
-// ------------------------------------------------------
-async function loadRespo(name){
-  try {
-    const res = await fetch(`/RESPO/${name}.json`);
-    return await res.json();
-  } catch(e){
-    return { NAME:name, MISS:true };
-  }
-}
+<h2>Business Module</h2>
+<a href="./BRM/BRM.index.html">BRM – Business Rücken Modul</a>
 
-async function loadAllRespos(){
-  const respos = [];
-  for(const n of RESPO_NAMES){
-    respos.push(await loadRespo(n));
-  }
-  return respos;
-}
+<hr>
 
-// ------------------------------------------------------
-// Renderer
-// ------------------------------------------------------
-function renderScan(scan){
-  const out = document.getElementById("output");
-  out.innerHTML = "";
+<h2>TOOLOMAT</h2>
+<a href="./TOOLOMAT/toolomat_dom.html">TOOLOMAT DOM – Struktur/Masse + Achsenbildung</a>
 
-  scan.forEach(r => {
-    const box = document.createElement("div");
-    box.className = "respo-box";
+<hr>
 
-    let statusClass = "ok";
-    if(r.RESULT === "HELFEN") statusClass = "help";
-    if(r.ERROR === true) statusClass = "error";
-    if(r.MISS === true) statusClass = "error";
+<h2>TIME Raster</h2>
+<a href="./TOOLOMAT/time_3x11_scroll_zoom.html">TIME 3×11 – Scroll + Zoom</a>
 
-    box.innerHTML = `
-      <h2 class="${statusClass}">${r.NAME}</h2>
-      <p><b>ID:</b> ${r.ID}</p>
-      <p><b>LAGE:</b> ${r.RAUM ? JSON.stringify(r.RAUM) : "(keine LAGE)"}</p>
-      <p><b>STATUS:</b> ${r.STATUS}</p>
-      <p><b>RESULT:</b> ${r.RESULT}</p>
-      <p><b>OUT:</b> ${JSON.stringify(r.OUT)}</p>
-      <p><b>REAL:</b> ${r.WAHRHEIT || "?"}</p>
-      <p><b>EDIT:</b> ${r.IST_IST || "?"}</p>
-    `;
+<hr>
 
-    out.appendChild(box);
-  });
-}
+<h2>RUN8 / O12 Kernel</h2>
+<a href="./RUN8/run8.html">RUN8 Kernel Engine</a>
 
-// ------------------------------------------------------
-// Start
-// ------------------------------------------------------
-loadAllRespos().then(respos => {
-  const scan = respos.map(r => GHOST_SCAN_REAL(r));
-  renderScan(scan);
-});
-</script>
+<hr>
+
+<h2>System Info</h2>
+<pre>
+SYS = System Root
+TEM = Zeit Root
+TΩ  = Fusion / Risiko / Stabilität
+XU  = Markt-Kreuz / tp-Sets
+Φ4  = Achsenfamilie (iki/bir/uc)
+O12 = OctaCore² + 12D Fusion
+BRM = Business Rücken Modul
+TIME = 3×11 Raster
+TOOLOMAT = DOM + Achsenbildung
+RUN8 = Kernel Engine
+</pre>
 
 </body>
 </html>
