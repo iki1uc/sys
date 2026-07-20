@@ -1,72 +1,33 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-<meta charset="UTF-8">
-<title>3hit90 – SYS ROOT</title>
+<div id="hh-panel">
+    <h2>HH – Host‑Hub Panel</h2>
 
-<style>
-body { background:#000; color:#0f0; font-family:Consolas, monospace; padding:20px; }
-h1, h2 { color:#6cf; }
-a { color:#6cf; display:block; margin:10px 0; font-size:18px; }
-hr { border:1px solid #333; margin:25px 0; }
-pre { background:#111; padding:12px; border:1px solid #333; }
-</style>
+    <div id="pq-status"></div>
+    <div id="px-status"></div>
+    <div id="pr-status"></div>
+</div>
 
-</head>
-<body>
+<script>
+(function () {
 
-<h1>3hit90 – SYS ROOT</h1>
-<p>TΩ + XU + Φ4 + O12 → System‑Fusion</p>
+    const ua = navigator.userAgent || navigator.vendor || window.opera;
 
-<hr>
+    const isAppleMobile = /iPhone|iPad|iPod/i.test(ua);
+    const isAndroidMobile = /Android/i.test(ua) && /Mobile/i.test(ua);
+    const isTablet = /iPad|Tablet|Tab/i.test(ua);
+    const isDesktop = !isAppleMobile && !isAndroidMobile && !isTablet;
 
-<h2>Geometrie‑Systeme</h2>
-<a href="./visual/o12.html">O12 – Morphing Geometry Engine</a>
-<a href="./visual/o12.html">TΩ – Tetraeder + Oktagon</a>
-<a href="./visual/o12.html">XU – Achsenkreuz + Unified Core</a>
-<a href="./visual/o12.html">Φ4 – Vierfach‑Achsenfamilie</a>
+    const pq = document.getElementById("pq-status");
+    const px = document.getElementById("px-status");
+    const pr = document.getElementById("pr-status");
 
-<hr>
+    if (isAppleMobile || isAndroidMobile || isTablet) {
+        px.innerHTML = "PX – <b>Apple/Mobile</b> <span>📱</span>";
+        window.location.replace("https://iki1uc.github.io/viPIio/");
+        return;
+    }
 
-<h2>Business Module</h2>
-<a href="./BRM/BRM.index.html">BRM – Business Rücken Modul</a>
+    pq.innerHTML = "PQ – <b>Laptop</b> <span>💻</span>";
+    pr.innerHTML = "PR – <b>Desktop</b> <span>🖥️</span>";
 
-<hr>
-
-<h2>TOOLOMAT</h2>
-<a href="./TOOLOMAT/toolomat_dom.html">TOOLOMAT DOM – Struktur/Masse + Achsenbildung</a>
-
-<hr>
-
-<h2>TIME Raster</h2>
-<a href="./TOOLOMAT/time_3x11_scroll_zoom.html">TIME 3×11 – Scroll + Zoom</a>
-
-<hr>
-
-<h2>RUN8 / O12 Kernel</h2>
-<a href="./RUN8/run8.html">RUN8 Kernel Engine</a>
-
-<hr>
-
-<h2>ID‑System</h2>
-<a href="./SYS.id.json">SYS.id.json</a>
-<a href="./TEM.id.json">TEM.id.json</a>
-
-<hr>
-
-<h2>System Info</h2>
-<pre>
-SYS = System Root
-TEM = Zeit Root
-TΩ  = Fusion / Risiko / Stabilität
-XU  = Markt-Kreuz / tp-Sets
-Φ4  = Achsenfamilie (iki/bir/uc)
-O12 = OctaCore² + 12D Fusion
-BRM = Business Rücken Modul
-TIME = 3×11 Raster
-TOOLOMAT = DOM + Achsenbildung
-RUN8 = Kernel Engine
-</pre>
-
-</body>
-</html>
+})();
+</script>
