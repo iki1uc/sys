@@ -1,0 +1,10 @@
+{
+  "NC.RESPO": {
+    "core": "RESPO_CORE",
+    "scan9": "RESPO_SCAN9",
+    "axis7": "RESPO_AXIS7",
+    "line2": "RESPO_LINE2",
+    "ghost": "RESPO_GHOST",
+    "nc-check": true
+  }
+}
