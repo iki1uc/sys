@@ -1,0 +1,10 @@
+{
+  "NC.link": {
+    "slot": "DMA-NC-slot",
+    "chain": "NC-chain",
+    "event": "NC-event",
+    "vector": "NC-vector",
+    "transit": "NC-transit",
+    "stability": "4u"
+  }
+}
