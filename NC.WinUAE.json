@@ -1,0 +1,13 @@
+{
+  "NC.WinUAE": {
+    "cpu": "68020-cycle-exact",
+    "jit": false,
+    "gpu": "DirectX",
+    "blitter": "cycle-exact",
+    "copper": "cycle-exact",
+    "chipram": "2MB",
+    "fastram": "32MB",
+    "dma": "NC-slot",
+    "timing": "NC-precise"
+  }
+}
