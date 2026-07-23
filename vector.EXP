@@ -1,0 +1,25 @@
+class VECTOR_EXP {
+
+    constructor(base){
+        this.base = base;
+    }
+
+    qi(i){ return i % 9; }
+    iqq(i){ return i % 3; }
+    octa(i){ return i % 8; }
+
+    pipe3(i){ return i % 3; }
+    pipe6(i){ return i % 6; }
+    pipe9(i){ return i % 9; }
+    pipe12(i){ return i % 12; }
+
+    recalc(){ /* reCALL */ }
+    reorganize(){ /* reORGANIZE */ }
+    reopt(){ /* REOPTMIZED */ }
+    redefrag(){ /* REDEFRAG */ }
+    reattikellate(){ /* REATTIKELLATE */ }
+    rehit(){ /* reHIT */ }
+    refinal(){ /* REfinal SETUP */ }
+}
+
+window.vectorEXP = new VECTOR_EXP(vector_raw);
