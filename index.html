@@ -2,90 +2,71 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>SYS – HH + RESPO + SYS‑Generator</title>
+<title>SYS – KOOP + POOK Finder</title>
 
 <style>
-body { background:#000; color:#0f0; font-family:Consolas, monospace; padding:20px; }
+body {
+    background:#000;
+    color:#0f0;
+    font-family:Consolas, monospace;
+    padding:20px;
+}
 h2 { color:#6cf; }
-#panel { border:1px solid #333; padding:15px; background:#111; margin-bottom:25px; }
-pre { background:#000; padding:12px; border:1px solid #333; white-space:pre; }
+#panel {
+    border:1px solid #333;
+    padding:15px;
+    margin-bottom:25px;
+    background:#111;
+}
+pre {
+    background:#000;
+    padding:12px;
+    border:1px solid #333;
+    white-space:pre;
+}
 </style>
 </head>
 <body>
 
 <div id="panel">
-    <h2>HH – Host‑Hub</h2>
-    <div id="pq-status"></div>
-    <div id="px-status"></div>
-    <div id="pr-status"></div>
+    <h2>SYS – KOOP + POOK Finder</h2>
+    <pre id="sys-output">Lade SYS…</pre>
 </div>
-
-<div id="panel">
-    <h2>RESPO – NC.RESPO.json</h2>
-    <pre id="respo-list">Lade RESPO…</pre>
-</div>
-
-<div id="panel">
-    <h2>FORMAT – format.js</h2>
-    <pre id="format-list">Lade FORMAT…</pre>
-</div>
-
-<div id="panel">
-    <h2>SYS‑Generator</h2>
-    <pre id="sys-gen">SYS wird erzeugt…</pre>
-</div>
-
-<script>
-// HH – Host‑Hub
-(function () {
-    const ua = navigator.userAgent;
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(ua);
-    const pq = document.getElementById("pq-status");
-    const px = document.getElementById("px-status");
-    const pr = document.getElementById("pr-status");
-
-    if (isMobile) {
-        px.innerHTML = "PX – <b>Mobile</b> 📱";
-        window.SYS = { host: "PX" };
-        return;
-    }
-
-    pq.innerHTML = "PQ – <b>Laptop</b> 💻";
-    pr.innerHTML = "PR – <b>Desktop</b> 🖥️";
-    window.SYS = { host: "PR" };
-})();
-</script>
 
 <script type="module">
-import { SYS_GENERATE } from "./SYS.generator.js";
 
-async function loadAll() {
+import { SYS_FIND_KOOP_POOK } from "./SYS.js";
 
-    // RESPO
-    const res = await fetch("./NC.RESPO.json");
-    const respo = await res.json();
-    const R = respo["NC.RESPO"];
-    document.getElementById("respo-list").innerText =
-        JSON.stringify(R, null, 2);
+// VECTOR.EXP ist global verfügbar
+const vector = window.vectorEXP;
 
-    // FORMAT
-    const f = await fetch("./format.js");
-    const format = await f.json();
-    document.getElementById("format-list").innerText =
-        JSON.stringify(format, null, 2);
+// RESPO‑CSV laden
+async function loadRESPO_CSV() {
+    const res = await fetch("./respo-funktion-6.csv");
+    const text = await res.text();
 
-    // SYS‑Generator
-    const generated = [];
-    for (const { key, value } of format) {
-        const sysFile = await SYS_GENERATE(key, value);
-        generated.push(sysFile);
-    }
-
-    document.getElementById("sys-gen").innerText =
-        JSON.stringify(generated, null, 2);
+    // CSV → Array
+    const lines = text.trim().split("\n").slice(1);
+    return lines.map(line => {
+        const [key, func, connect] = line.split(",");
+        return { key, func, "Connect‑Fähigkeit": connect };
+    });
 }
 
-loadAll();
+async function runSYS() {
+
+    const respoList = await loadRESPO_CSV();
+
+    // KOOP + POOK Finder
+    const result = SYS_FIND_KOOP_POOK(respoList);
+
+    // Ausgabe
+    document.getElementById("sys-output").innerText =
+        JSON.stringify(result, null, 2);
+}
+
+runSYS();
+
 </script>
 
 </body>
