@@ -2,130 +2,90 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>SYS – HH + RESPO + FORMAT</title>
+<title>SYS – HH + RESPO + SYS‑Generator</title>
 
 <style>
-body {
-    background:#000;
-    color:#0f0;
-    font-family:Consolas, monospace;
-    padding:20px;
-}
+body { background:#000; color:#0f0; font-family:Consolas, monospace; padding:20px; }
 h2 { color:#6cf; }
-#hh-panel, #respo-panel, #format-panel {
-    border:1px solid #333;
-    padding:15px;
-    margin-bottom:25px;
-    background:#111;
-}
-pre {
-    background:#000;
-    padding:12px;
-    border:1px solid #333;
-    white-space:pre;
-}
+#panel { border:1px solid #333; padding:15px; background:#111; margin-bottom:25px; }
+pre { background:#000; padding:12px; border:1px solid #333; white-space:pre; }
 </style>
 </head>
 <body>
 
-<!-- HH PANEL -->
-<div id="hh-panel">
-    <h2>HH – Host‑Hub Panel</h2>
-
+<div id="panel">
+    <h2>HH – Host‑Hub</h2>
     <div id="pq-status"></div>
     <div id="px-status"></div>
     <div id="pr-status"></div>
 </div>
 
-<!-- RESPO PANEL -->
-<div id="respo-panel">
+<div id="panel">
     <h2>RESPO – NC.RESPO.json</h2>
     <pre id="respo-list">Lade RESPO…</pre>
 </div>
 
-<!-- FORMAT PANEL -->
-<div id="format-panel">
+<div id="panel">
     <h2>FORMAT – format.js</h2>
     <pre id="format-list">Lade FORMAT…</pre>
 </div>
 
+<div id="panel">
+    <h2>SYS‑Generator</h2>
+    <pre id="sys-gen">SYS wird erzeugt…</pre>
+</div>
+
 <script>
-// ------------------------------------------------------------
-// HH – Host‑Hub Erkennung
-// ------------------------------------------------------------
+// HH – Host‑Hub
 (function () {
-
-    const ua = navigator.userAgent || navigator.vendor || window.opera;
-
-    const isAppleMobile = /iPhone|iPad|iPod/i.test(ua);
-    const isAndroidMobile = /Android/i.test(ua) && /Mobile/i.test(ua);
-    const isTablet = /iPad|Tablet|Tab/i.test(ua);
-    const isDesktop = !isAppleMobile && !isAndroidMobile && !isTablet;
-
+    const ua = navigator.userAgent;
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(ua);
     const pq = document.getElementById("pq-status");
     const px = document.getElementById("px-status");
     const pr = document.getElementById("pr-status");
 
-    if (isAppleMobile || isAndroidMobile || isTablet) {
-        px.innerHTML = "PX – <b>Apple/Mobile</b> <span>📱</span>";
-        window.location.replace("https://iki1uc.github.io/viPIio/");
+    if (isMobile) {
+        px.innerHTML = "PX – <b>Mobile</b> 📱";
+        window.SYS = { host: "PX" };
         return;
     }
 
-    pq.innerHTML = "PQ – <b>Laptop</b> <span>💻</span>";
-    pr.innerHTML = "PR – <b>Desktop</b> <span>🖥️</span>";
-
+    pq.innerHTML = "PQ – <b>Laptop</b> 💻";
+    pr.innerHTML = "PR – <b>Desktop</b> 🖥️";
+    window.SYS = { host: "PR" };
 })();
 </script>
 
 <script type="module">
-// ------------------------------------------------------------
-// RESPO – NC.RESPO.json laden und anzeigen
-// ------------------------------------------------------------
-async function loadRESPO() {
+import { SYS_GENERATE } from "./SYS.generator.js";
 
-    try {
-        const res = await fetch("./NC.RESPO.json");
-        const json = await res.json();
+async function loadAll() {
 
-        const R = json["NC.RESPO"];
+    // RESPO
+    const res = await fetch("./NC.RESPO.json");
+    const respo = await res.json();
+    const R = respo["NC.RESPO"];
+    document.getElementById("respo-list").innerText =
+        JSON.stringify(R, null, 2);
 
-        const list = Object.entries(R).map(([key, value]) => {
-            return { key, value };
-        });
+    // FORMAT
+    const f = await fetch("./format.js");
+    const format = await f.json();
+    document.getElementById("format-list").innerText =
+        JSON.stringify(format, null, 2);
 
-        document.getElementById("respo-list").innerText =
-            JSON.stringify(list, null, 2);
-
-    } catch (e) {
-        document.getElementById("respo-list").innerText =
-            "Fehler beim Laden von NC.RESPO.json";
+    // SYS‑Generator
+    const generated = [];
+    for (const { key, value } of format) {
+        const sysFile = await SYS_GENERATE(key, value);
+        generated.push(sysFile);
     }
+
+    document.getElementById("sys-gen").innerText =
+        JSON.stringify(generated, null, 2);
 }
 
-// ------------------------------------------------------------
-// FORMAT – format.js laden und anzeigen
-// ------------------------------------------------------------
-async function loadFORMAT() {
-
-    try {
-        const res = await fetch("./format.js");
-        const text = await res.text();
-
-        // format.js ist ein JSON‑Array → direkt parsen
-        const json = JSON.parse(text);
-
-        document.getElementById("format-list").innerText =
-            JSON.stringify(json, null, 2);
-
-    } catch (e) {
-        document.getElementById("format-list").innerText =
-            "Fehler beim Laden von format.js";
-    }
-}
-
-loadRESPO();
-loadFORMAT();
+loadAll();
 </script>
 
 </body>
