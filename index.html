@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>SYS – HH + RESPO</title>
+<title>SYS – HH + RESPO + FORMAT</title>
 
 <style>
 body {
@@ -12,7 +12,7 @@ body {
     padding:20px;
 }
 h2 { color:#6cf; }
-#hh-panel, #respo-panel {
+#hh-panel, #respo-panel, #format-panel {
     border:1px solid #333;
     padding:15px;
     margin-bottom:25px;
@@ -41,6 +41,12 @@ pre {
 <div id="respo-panel">
     <h2>RESPO – NC.RESPO.json</h2>
     <pre id="respo-list">Lade RESPO…</pre>
+</div>
+
+<!-- FORMAT PANEL -->
+<div id="format-panel">
+    <h2>FORMAT – format.js</h2>
+    <pre id="format-list">Lade FORMAT…</pre>
 </div>
 
 <script>
@@ -97,7 +103,29 @@ async function loadRESPO() {
     }
 }
 
+// ------------------------------------------------------------
+// FORMAT – format.js laden und anzeigen
+// ------------------------------------------------------------
+async function loadFORMAT() {
+
+    try {
+        const res = await fetch("./format.js");
+        const text = await res.text();
+
+        // format.js ist ein JSON‑Array → direkt parsen
+        const json = JSON.parse(text);
+
+        document.getElementById("format-list").innerText =
+            JSON.stringify(json, null, 2);
+
+    } catch (e) {
+        document.getElementById("format-list").innerText =
+            "Fehler beim Laden von format.js";
+    }
+}
+
 loadRESPO();
+loadFORMAT();
 </script>
 
 </body>
