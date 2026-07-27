@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>IMPORT – PIPE‑4 Rechner</title>
+
+<style>
+body { background:#000; color:#0f0; font-family:Consolas, monospace; padding:20px; }
+h2 { color:#6cf; }
+pre { background:#111; padding:12px; border:1px solid #333; }
+</style>
+</head>
+<body>
+
+<h2>IMPORT – PIPE‑4 Rechner</h2>
+<pre id="output">Lade…</pre>
+
+<script type="module">
+
+import { IMPORT_RECHNER } from "./rechner.js";
+
+// Warten bis RESPO geladen ist
+async function waitForRespo() {
+    while (!window.RESPO_LIST) {
+        await new Promise(r => setTimeout(r, 50));
+    }
+}
+
+async function run() {
+
+    await waitForRespo();
+
+    const result = IMPORT_RECHNER(42); // Beispielwert
+
+    document.getElementById("output").innerText =
+        JSON.stringify(result, null, 2);
+}
+
+run();
+
+</script>
+
+</body>
+</html>
