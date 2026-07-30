@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>SYS – KOOP + POOK Finder</title>
+<title>iki1uc Runtime + SYS KOOP/POOK</title>
 
 <style>
 body {
@@ -26,19 +26,37 @@ pre {
 }
 </style>
 </head>
+
 <body>
 
+<h1>iki1uc Runtime Boot</h1>
+
+<!-- ============================
+     SYS – KOOP + POOK PANEL
+============================= -->
 <div id="panel">
     <h2>SYS – KOOP + POOK Finder</h2>
     <pre id="sys-output">Lade SYS…</pre>
 </div>
 
+<!-- ============================
+     JS MODULES
+============================= -->
 <script type="module">
 
-// ======================================================
-// 1. Station-Bewertung (Zugriff / Speed / Transfer / Zuverlässigkeit)
-// ======================================================
+// =====================================
+// 1. iki1uc sys.boot Runtime starten
+// =====================================
+import { sys_boot } from "./sys.boot.js";
 
+const bootState = sys_boot();
+console.log("SYS BOOT:", bootState);
+
+// =====================================
+// 2. SYS – KOOP + POOK Finder
+// =====================================
+
+// Station-Bewertung
 const SYS_MODE = {
     GREEN:  { level: 1, speed: 1.0, desc: "Optimal" },
     YELLOW: { level: 2, speed: 0.6, desc: "Mittel" },
@@ -46,118 +64,4 @@ const SYS_MODE = {
 };
 
 function scoreStation(st) {
-    return Math.max(0, Math.min(100,
-        (st.zugriff ?? 0) * 0.25 +
-        (st.speed ?? 0) * 0.30 +
-        (st.transfer ?? 0) * 0.25 +
-        (st.zuver ?? 0) * 0.20
-    ));
-}
-
-function modeFromScore(score){
-    if(score >= 80) return SYS_MODE.GREEN;
-    if(score >= 40) return SYS_MODE.YELLOW;
-    return SYS_MODE.RED;
-}
-
-function evaluateStation(st){
-    const score = scoreStation(st);
-    const mode = modeFromScore(score);
-
-    return {
-        id: st.id,
-        score,
-        color: mode === SYS_MODE.GREEN ? "green" :
-               mode === SYS_MODE.YELLOW ? "yellow" : "red",
-        speed: mode.speed,
-        desc: mode.desc
-    };
-}
-
-// ======================================================
-// 2. KOOP + POOK Finder
-// ======================================================
-
-function SYS_FIND_KOOP_POOK(list){
-
-    const koop = list.filter(x => x.mode === "KOOP");
-    const pook = list.filter(x => x.mode === "POOK");
-
-    return {
-        KOOP: koop,
-        POOK: pook,
-        count: {
-            koop: koop.length,
-            pook: pook.length
-        }
-    };
-}
-
-// ======================================================
-// 3. Schwarzes Schaf Finder (Station mit schlechtester Bewertung)
-// ======================================================
-
-function findBlackSheep(stations){
-    let worst = null;
-
-    for(const st of stations){
-        const ev = evaluateStation(st);
-        if(!worst || ev.score < worst.score){
-            worst = ev;
-        }
-    }
-
-    return worst;
-}
-
-// ======================================================
-// 4. RESPO CSV Loader
-// ======================================================
-
-async function loadRESPO_CSV(){
-    const res = await fetch("./respo-funktion-6.csv");
-    const txt = await res.text();
-    const lines = txt.split("\n").filter(x => x.trim().length);
-
-    return lines.map(l => {
-        const [id, mode] = l.split(",");
-        return { id, mode };
-    });
-}
-
-// ======================================================
-// 5. RUN SYS
-// ======================================================
-
-async function runSYS() {
-
-    const respoList = await loadRESPO_CSV();
-
-    const koopPook = SYS_FIND_KOOP_POOK(respoList);
-
-    // Beispiel Stationen (du kannst echte Daten einfügen)
-    const stations = [
-        { id:"TMP", zugriff:90, speed:85, transfer:80, zuver:95 },
-        { id:"ROM", zugriff:40, speed:50, transfer:45, zuver:60 },
-        { id:"NC",  zugriff:20, speed:30, transfer:25, zuver:40 }
-    ];
-
-    const evaluated = stations.map(evaluateStation);
-    const blackSheep = findBlackSheep(stations);
-
-    const result = {
-        koop_pook: koopPook,
-        station_eval: evaluated,
-        black_sheep: blackSheep
-    };
-
-    document.getElementById("sys-output").innerText =
-        JSON.stringify(result, null, 2);
-}
-
-runSYS();
-
-</script>
-
-</body>
-</html>
+    return Math.max(0, Math.min
