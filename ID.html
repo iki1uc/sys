@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>ID – Identität Root</title>
+
+<style>
+body { background:#000; color:#0f0; font-family:Consolas, monospace; padding:20px; }
+h1, h2 { color:#6cf; }
+pre { background:#111; padding:12px; border:1px solid #333; }
+</style>
+
+<script src="SYS.id.json"></script>
+<script src="TEM.id.json"></script>
+
+</head>
+<body>
+
+<h1>ID – Identität Root</h1>
+<p>ID = Identitäts‑Engine des 3hit90‑Systems</p>
+
+<hr>
+
+<h2>SYS Identität</h2>
+<pre id="sys-id">Lade SYS.id.json…</pre>
+
+<script>
+fetch("SYS.id.json")
+    .then(r => r.json())
+    .then(data => {
+        document.getElementById("sys-id").innerText =
+            JSON.stringify(data, null, 4);
+    })
+    .catch(() => {
+        document.getElementById("sys-id").innerText =
+            "Fehler: SYS.id.json konnte nicht geladen werden.";
+    });
+</script>
+
+<hr>
+
+<h2>TEM Identität</h2>
+<pre id="tem-id">Lade TEM.id.json…</pre>
+
+<script>
+fetch("TEM.id.json")
+    .then(r => r.json())
+    .then(data => {
+        document.getElementById("tem-id").innerText =
+            JSON.stringify(data, null, 4);
+    })
+    .catch(() => {
+        document.getElementById("tem-id").innerText =
+            "Fehler: TEM.id.json konnte nicht geladen werden.";
+    });
+</script>
+
+</body>
+</html>
