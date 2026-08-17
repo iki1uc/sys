@@ -2,66 +2,118 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>iki1uc Runtime + SYS KOOP/POOK</title>
+<title>SYS – Struktur Root (3‑6‑9 Engine)</title>
 
 <style>
-body {
-    background:#000;
-    color:#0f0;
-    font-family:Consolas, monospace;
-    padding:20px;
-}
-h2 { color:#6cf; }
-#panel {
-    border:1px solid #333;
-    padding:15px;
-    margin-bottom:25px;
-    background:#111;
-}
-pre {
-    background:#000;
-    padding:12px;
-    border:1px solid #333;
-    white-space:pre;
-}
+body { background:#000; color:#0f0; font-family:Consolas, monospace; padding:20px; }
+h1, h2 { color:#6cf; }
+a { color:#6cf; display:block; margin:10px 0; font-size:18px; }
+hr { border:1px solid #333; margin:25px 0; }
+pre { background:#111; padding:12px; border:1px solid #333; }
+#hh-panel { margin-top:20px; padding:12px; border:1px solid #333; }
 </style>
+
+<!-- Routing -->
+<script src="routing.js"></script>
+
+<!-- SYS Engines -->
+<script src="window.SYS"></script>
+<script src="SYS.lyc.js"></script>
+<script src="SYS.generator.js"></script>
+
+<!-- RIZ -->
+<script src="DOOR.js"></script>
+<script src="DOO.js"></script>
+<script src="SHELL.js"></script>
+
+<!-- SYS3 -->
+<script src="XyX.js"></script>
+
+<!-- NC Engine -->
+<script src="NC.9y9.json"></script>
+
 </head>
 
 <body>
 
-<h1>iki1uc Runtime Boot</h1>
+<h1>SYS – Struktur Root</h1>
+<p>SYS = Struktur‑Engine des 3hit90‑Systems</p>
 
-<!-- ============================
-     SYS – KOOP + POOK PANEL
-============================= -->
-<div id="panel">
-    <h2>SYS – KOOP + POOK Finder</h2>
-    <pre id="sys-output">Lade SYS…</pre>
-</div>
+<hr>
 
-<!-- ============================
-     JS MODULES
-============================= -->
-<script type="module">
+<h2>Root‑Quadranten</h2>
+<a href="tem.index.html">TEM Root</a>
+<a href="ID.html">ID Root</a>
+<a href="plus/minus(sys(tem)+/-).html">OP Root</a>
+<a href="SYS.id.json">SYS.id.json</a>
 
-// =====================================
-// 1. iki1uc sys.boot Runtime starten
-// =====================================
-import { sys_boot } from "./sys.boot.js";
+<hr>
 
-const bootState = sys_boot();
-console.log("SYS BOOT:", bootState);
+<h2>SYS – 3‑6‑9 Struktur</h2>
+<pre>
+SYS3  = IN, CORE, OUT        (XyX.js)
+TEM6  = ESSO, ROLLER, KASSE,
+        DOOR, DOO, SHELL     (TET + RIZ)
+SYS9  = NC.9y9.json          (NC Engine)
 
-// =====================================
-// 2. SYS – KOOP + POOK Finder
-// =====================================
+(((SYS3))) TEM6 (((SYS9)))
+</pre>
 
-// Station-Bewertung
-const SYS_MODE = {
-    GREEN:  { level: 1, speed: 1.0, desc: "Optimal" },
-    YELLOW: { level: 2, speed: 0.6, desc: "Mittel" },
-    RED:    { level: 3, speed: 0.2, desc: "Schlecht" }
-};
+<hr>
 
-function scoreStation(st) {
-    return Math.max(0, Math.min
+<h2>RIZ – Gegenbewegung (−T)</h2>
+<pre>
+DOOR  – Öffnung
+DOO   – Abfluss
+SHELL – Stabilisierung
+</pre>
+
+<hr>
+
+<h2>window.SYS – Vektor‑Engine</h2>
+<pre id="vec-info">Lade Vektor‑Engine…</pre>
+
+<script>
+try {
+    document.getElementById("vec-info").innerText =
+        JSON.stringify(SYS.vector, null, 4);
+} catch(e){
+    document.getElementById("vec-info").innerText =
+        "Fehler: window.SYS konnte nicht geladen werden.";
+}
+</script>
+
+<hr>
+
+<h2>SYS Analyse – SYS.lyc.js</h2>
+<pre>
+score()
+modeFromScore()
+evaluate()
+</pre>
+
+<hr>
+
+<h2>NC – SYS9 Engine</h2>
+<pre id="nc-info">Lade NC.9y9.json…</pre>
+
+<script>
+fetch("NC.9y9.json")
+    .then(r => r.json())
+    .then(data => {
+        document.getElementById("nc-info").innerText =
+            JSON.stringify(data, null, 4);
+    })
+    .catch(() => {
+        document.getElementById("nc-info").innerText =
+            "Fehler: NC.9y9.json konnte nicht geladen werden.";
+    });
+</script>
+
+<hr>
+
+<h2>Host‑Hub Panel</h2>
+<div id="hh-panel">Lade Routing…</div>
+
+</body>
+</html>
