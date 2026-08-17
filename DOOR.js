@@ -8,4 +8,3 @@ export const DOOR = {
     diag: "W→S",
     status: "aktiv"
 };
-
