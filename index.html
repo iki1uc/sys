@@ -2,118 +2,781 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>SYS – Struktur Root (3‑6‑9 Engine)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SYS · 3-6-9 Engine · Struktur Root · FLUSS</title>
 
 <style>
-body { background:#000; color:#0f0; font-family:Consolas, monospace; padding:20px; }
-h1, h2 { color:#6cf; }
-a { color:#6cf; display:block; margin:10px 0; font-size:18px; }
-hr { border:1px solid #333; margin:25px 0; }
-pre { background:#111; padding:12px; border:1px solid #333; }
-#hh-panel { margin-top:20px; padding:12px; border:1px solid #333; }
+:root {
+    --bg: #0a0a12;
+    --fg: #0f0;
+    --gold: #ffd700;
+    --sys3: #ff6b6b;
+    --tem6: #6bff6b;
+    --sys9: #6b6bff;
+    --riz: #ffd93d;
+    --nc: #ff44ff;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Consolas', monospace;
+    min-height: 100vh;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    gap: 6px;
+    padding: 10px;
+    overflow: hidden;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--gold);
+    padding-bottom: 6px;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+header h1 {
+    font-size: 16px;
+    color: var(--gold);
+    letter-spacing: 3px;
+}
+header h1 .sys { color: var(--sys3); }
+header h1 .tem { color: var(--tem6); }
+header h1 .nc { color: var(--sys9); }
+#info-bar { font-size: 9px; color: #666; display: flex; gap: 8px; align-items: center; }
+
+main {
+    display: grid;
+    grid-template-columns: 3fr 1.2fr;
+    gap: 6px;
+    height: 100%;
+    min-height: 0;
+}
+
+#canvas-wrap {
+    background: #0a0a0f;
+    border: 1px solid #1a1a2a;
+    border-radius: 10px;
+    padding: 6px;
+    position: relative;
+    overflow: hidden;
+}
+#canvas-wrap canvas {
+    width: 100%;
+    height: 100%;
+    border-radius: 6px;
+    display: block;
+}
+#canvas-overlay {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    font-size: 7px;
+    color: #444;
+    pointer-events: none;
+    background: rgba(0,0,0,0.7);
+    padding: 3px 8px;
+    border-radius: 3px;
+}
+#canvas-overlay .fluss { color: var(--gold); }
+
+#panel {
+    background: #0a0a0f;
+    border: 1px solid #1a1a2a;
+    border-radius: 10px;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    overflow-y: auto;
+    max-height: 100%;
+}
+#panel h3 { font-size: 9px; color: #666; border-bottom: 1px solid #1a1a2a; padding-bottom: 3px; }
+
+#layers {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 3px;
+}
+.layer {
+    background: rgba(255,255,255,0.02);
+    border-radius: 6px;
+    padding: 4px 6px;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.04);
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.layer:hover {
+    border-color: var(--gold);
+    background: rgba(255,215,61,0.05);
+}
+.layer .sym { font-size: 14px; display: block; }
+.layer .label { color: #666; font-size: 5px; text-transform: uppercase; letter-spacing: 1px; }
+.layer .desc { color: #444; font-size: 4px; }
+.layer.active { border-color: var(--gold); background: rgba(255,215,61,0.08); }
+
+#log {
+    flex: 1;
+    overflow-y: auto;
+    font-size: 7px;
+    color: #6a6a8a;
+    line-height: 1.3;
+    min-height: 30px;
+    max-height: 60px;
+    background: #06060a;
+    border-radius: 4px;
+    padding: 3px 5px;
+}
+#log .entry { padding: 1px 0; border-bottom: 1px solid #0a0a12; }
+#log .time { color: #444; }
+#log .msg.sys3 { color: var(--sys3); }
+#log .msg.tem6 { color: var(--tem6); }
+#log .msg.sys9 { color: var(--sys9); }
+#log .msg.riz { color: var(--riz); }
+#log .msg.nc { color: var(--nc); }
+#log .msg.fluss { color: var(--gold); }
+
+#metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 2px;
+}
+.metric {
+    background: #0e0e1a;
+    border-radius: 3px;
+    padding: 2px 3px;
+    text-align: center;
+    border: 1px solid #1a1a2a;
+}
+.metric .label { color: #666; font-size: 5px; text-transform: uppercase; }
+.metric .value { font-size: 9px; font-weight: bold; }
+.metric.sys3 .value { color: var(--sys3); }
+.metric.tem6 .value { color: var(--tem6); }
+.metric.sys9 .value { color: var(--sys9); }
+.metric.riz .value { color: var(--riz); }
+
+#controls {
+    display: flex;
+    gap: 2px;
+    flex-wrap: wrap;
+}
+button {
+    background: #111;
+    color: var(--fg);
+    border: 1px solid #333;
+    padding: 3px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 8px;
+    transition: all 0.2s;
+}
+button:hover { background: #1a1a2a; border-color: var(--gold); }
+button:active { transform: scale(0.95); }
+button.primary { border-color: var(--gold); color: var(--gold); }
+button.primary:hover { background: var(--gold); color: #000; }
+button.sys3 { border-color: var(--sys3); color: var(--sys3); }
+button.sys3:hover { background: var(--sys3); color: #000; }
+button.tem6 { border-color: var(--tem6); color: var(--tem6); }
+button.tem6:hover { background: var(--tem6); color: #000; }
+button.sys9 { border-color: var(--sys9); color: var(--sys9); }
+button.sys9:hover { background: var(--sys9); color: #000; }
+button.riz { border-color: var(--riz); color: var(--riz); }
+button.riz:hover { background: var(--riz); color: #000; }
+button.danger { border-color: #f44; color: #f44; }
+button.danger:hover { background: #f44; color: #000; }
+
+@media (max-width: 800px) {
+    main { grid-template-columns: 1fr; }
+    #panel { max-height: 180px; }
+    #layers { grid-template-columns: 1fr 1fr; }
+}
 </style>
-
-<!-- Routing -->
-<script src="routing.js"></script>
-
-<!-- SYS Engines -->
-<script src="window.SYS"></script>
-<script src="SYS.lyc.js"></script>
-<script src="SYS.generator.js"></script>
-
-<!-- RIZ -->
-<script src="DOOR.js"></script>
-<script src="DOO.js"></script>
-<script src="SHELL.js"></script>
-
-<!-- SYS3 -->
-<script src="XyX.js"></script>
-
-<!-- NC Engine -->
-<script src="NC.9y9.json"></script>
-
 </head>
-
 <body>
 
-<h1>SYS – Struktur Root</h1>
-<p>SYS = Struktur‑Engine des 3hit90‑Systems</p>
+<header>
+    <h1>
+        <span class="sys">◈ SYS</span>
+        <span style="color:#666;">·</span>
+        <span class="tem">TEM</span>
+        <span style="color:#666;">·</span>
+        <span class="nc">NC</span>
+        <span style="color:#666;">·</span>
+        <span style="color:var(--gold);">3-6-9 FLUSS</span>
+    </h1>
+    <div id="info-bar">
+        <span id="clock">⏱️ --:--:--</span>
+        <span id="state-display" style="color:var(--gold);">● bereit</span>
+        <span id="cycle-display" style="color:#666;">FLUSS 0</span>
+    </div>
+</header>
 
-<hr>
+<main>
+    <div id="canvas-wrap">
+        <canvas id="flussCanvas"></canvas>
+        <div id="canvas-overlay">
+            <span class="fluss">🌊</span> SYS · 3-6-9 · Struktur Root
+        </div>
+    </div>
 
-<h2>Root‑Quadranten</h2>
-<a href="tem.index.html">TEM Root</a>
-<a href="ID.html">ID Root</a>
-<a href="plus/minus(sys(tem)+/-).html">OP Root</a>
-<a href="SYS.id.json">SYS.id.json</a>
+    <div id="panel">
+        <h3>🌊 3-6-9 · STRUKTUR</h3>
 
-<hr>
+        <div id="layers">
+            <div class="layer active" data-layer="SYS3">
+                <span class="sym">◈</span>
+                <span class="label">SYS3</span>
+                <span class="desc">IN·CORE·OUT</span>
+            </div>
+            <div class="layer" data-layer="TEM6">
+                <span class="sym">🌀</span>
+                <span class="label">TEM6</span>
+                <span class="desc">TET + RIZ</span>
+            </div>
+            <div class="layer" data-layer="SYS9">
+                <span class="sym">▣</span>
+                <span class="label">SYS9</span>
+                <span class="desc">9×9 NC</span>
+            </div>
+        </div>
 
-<h2>SYS – 3‑6‑9 Struktur</h2>
-<pre>
-SYS3  = IN, CORE, OUT        (XyX.js)
-TEM6  = ESSO, ROLLER, KASSE,
-        DOOR, DOO, SHELL     (TET + RIZ)
-SYS9  = NC.9y9.json          (NC Engine)
+        <div id="metrics">
+            <div class="metric sys3"><div class="label">SYS3</div><div class="value" id="sys3-value">●</div></div>
+            <div class="metric tem6"><div class="label">TEM6</div><div class="value" id="tem6-value">0</div></div>
+            <div class="metric sys9"><div class="label">SYS9</div><div class="value" id="sys9-value">0</div></div>
+            <div class="metric riz"><div class="label">RIZ</div><div class="value" id="riz-value">0</div></div>
+        </div>
 
-(((SYS3))) TEM6 (((SYS9)))
-</pre>
+        <div id="log">
+            <div class="entry"><span class="time">[INIT]</span> <span class="msg fluss">🌊 SYS · 3-6-9 · Struktur Root</span></div>
+            <div class="entry"><span class="time">[INIT]</span> <span class="msg sys3">SYS3: IN · CORE · OUT</span></div>
+            <div class="entry"><span class="time">[INIT]</span> <span class="msg tem6">TEM6: TET (+T) · RIZ (-T)</span></div>
+            <div class="entry"><span class="time">[INIT]</span> <span class="msg sys9">SYS9: 9×9 NC-Engine</span></div>
+        </div>
 
-<hr>
-
-<h2>RIZ – Gegenbewegung (−T)</h2>
-<pre>
-DOOR  – Öffnung
-DOO   – Abfluss
-SHELL – Stabilisierung
-</pre>
-
-<hr>
-
-<h2>window.SYS – Vektor‑Engine</h2>
-<pre id="vec-info">Lade Vektor‑Engine…</pre>
+        <div id="controls">
+            <button class="primary" id="btn-start">▶ START</button>
+            <button class="sys3" id="btn-sys3">◈ SYS3</button>
+            <button class="tem6" id="btn-tem6">🌀 TEM6</button>
+            <button class="sys9" id="btn-sys9">▣ SYS9</button>
+            <button class="riz" id="btn-riz">⚡ RIZ</button>
+            <button class="danger" id="btn-reset">⟲ RESET</button>
+            <button id="btn-auto">▶ AUTO</button>
+        </div>
+    </div>
+</main>
 
 <script>
-try {
-    document.getElementById("vec-info").innerText =
-        JSON.stringify(SYS.vector, null, 4);
-} catch(e){
-    document.getElementById("vec-info").innerText =
-        "Fehler: window.SYS konnte nicht geladen werden.";
+// ============================================================
+// SYS · 3-6-9 · STRUKTUR ROOT · FLUSS
+// ============================================================
+
+// --- SYS3 ---
+var SYS3 = {
+    IN: 'SYS-IN',
+    CORE: 'SYS-CORE',
+    OUT: 'SYS-OUT'
+};
+
+// --- TEM6 ---
+var TEM6 = {
+    TET: ['ESSO', 'ROLLER', 'KASSE'],
+    RIZ: ['DOOR', 'DOO', 'SHELL']
+};
+
+// --- SYS9 ---
+var SYS9 = {
+    grid: [
+        ['NC(1,1)','NC(1,2)','NC(1,3)','NC(1,4)','NC(1,5)','NC(1,6)','NC(1,7)','NC(1,8)','NC(1,9)'],
+        ['NC(2,1)','NC(2,2)','NC(2,3)','NC(2,4)','NC(2,5)','NC(2,6)','NC(2,7)','NC(2,8)','NC(2,9)'],
+        ['NC(3,1)','NC(3,2)','NC(3,3)','NC(3,4)','NC(3,5)','NC(3,6)','NC(3,7)','NC(3,8)','NC(3,9)'],
+        ['NC(4,1)','NC(4,2)','NC(4,3)','NC(4,4)','NC(4,5)','NC(4,6)','NC(4,7)','NC(4,8)','NC(4,9)'],
+        ['NC(5,1)','NC(5,2)','NC(5,3)','NC(5,4)','NC(5,5)','NC(5,6)','NC(5,7)','NC(5,8)','NC(5,9)'],
+        ['NC(6,1)','NC(6,2)','NC(6,3)','NC(6,4)','NC(6,5)','NC(6,6)','NC(6,7)','NC(6,8)','NC(6,9)'],
+        ['NC(7,1)','NC(7,2)','NC(7,3)','NC(7,4)','NC(7,5)','NC(7,6)','NC(7,7)','NC(7,8)','NC(7,9)'],
+        ['NC(8,1)','NC(8,2)','NC(8,3)','NC(8,4)','NC(8,5)','NC(8,6)','NC(8,7)','NC(8,8)','NC(8,9)'],
+        ['NC(9,1)','NC(9,2)','NC(9,3)','NC(9,4)','NC(9,5)','NC(9,6)','NC(9,7)','NC(9,8)','NC(9,9)']
+    ],
+    mode: 'RESPO-WHIRL-NC',
+    selectable: true
+};
+
+// --- RIZ ---
+var RIZ = {
+    DOOR: { name: 'DOOR', role: 'Öffnung', drive: '-T' },
+    DOO: { name: 'DOO', role: 'Abfluss', drive: '-T' },
+    SHELL: { name: 'SHELL', role: 'Stabilisierung', drive: '-T' }
+};
+
+// ============================================================
+// CANVAS SETUP
+// ============================================================
+var canvas = document.getElementById('flussCanvas');
+var ctx = canvas.getContext('2d');
+var W, H, cx, cy, radius;
+
+function resizeCanvas() {
+    var wrap = document.getElementById('canvas-wrap');
+    var rect = wrap.getBoundingClientRect();
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+    W = canvas.width; H = canvas.height;
+    cx = W / 2; cy = H / 2;
+    radius = Math.min(W, H) * 0.38;
 }
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+// ============================================================
+// STATE
+// ============================================================
+var state = {
+    running: false,
+    autoMode: false,
+    cycle: 0,
+    t: 0,
+    activeLayer: 'SYS3',
+    sys3Count: 0,
+    tem6Count: 0,
+    sys9Count: 0,
+    rizCount: 0,
+    gridPos: 0
+};
+
+// ============================================================
+// LOG
+// ============================================================
+function log(msg, type) {
+    var logDiv = document.getElementById('log');
+    var entry = document.createElement('div');
+    entry.className = 'entry';
+    var time = new Date().toLocaleTimeString();
+    var cls = type === 'sys3' ? 'sys3' : type === 'tem6' ? 'tem6' :
+              type === 'sys9' ? 'sys9' : type === 'riz' ? 'riz' :
+              type === 'fluss' ? 'fluss' : '';
+    entry.innerHTML = '<span class="time">[' + time + ']</span> <span class="msg ' + cls + '">' + msg + '</span>';
+    logDiv.appendChild(entry);
+    logDiv.scrollTop = logDiv.scrollHeight;
+    while (logDiv.children.length > 50) logDiv.removeChild(logDiv.firstChild);
+}
+
+// ============================================================
+// KERN-FUNKTIONEN
+// ============================================================
+
+function activateLayer(key) {
+    state.activeLayer = key;
+    var els = document.querySelectorAll('.layer');
+    for (var i = 0; i < els.length; i++) {
+        var el = els[i];
+        if (el.getAttribute('data-layer') === key) {
+            el.classList.add('active');
+        } else {
+            el.classList.remove('active');
+        }
+    }
+
+    switch(key) {
+        case 'SYS3':
+            state.sys3Count++;
+            log('◈ SYS3: IN · CORE · OUT', 'sys3');
+            document.getElementById('sys3-value').textContent = '●';
+            break;
+        case 'TEM6':
+            state.tem6Count++;
+            var tet = TEM6.TET.join(' · ');
+            var riz = TEM6.RIZ.join(' · ');
+            log('🌀 TEM6: TET (+T) → ' + tet + ' · RIZ (-T) → ' + riz, 'tem6');
+            document.getElementById('tem6-value').textContent = state.tem6Count;
+            break;
+        case 'SYS9':
+            state.sys9Count++;
+            var pos = state.gridPos % 81;
+            var row = Math.floor(pos / 9);
+            var col = pos % 9;
+            var cell = SYS9.grid[row] ? SYS9.grid[row][col] : 'NC(0,0)';
+            log('▣ SYS9: ' + cell + ' · ' + SYS9.mode, 'sys9');
+            document.getElementById('sys9-value').textContent = state.sys9Count;
+            state.gridPos++;
+            break;
+    }
+}
+
+function rizStep() {
+    state.rizCount++;
+    var keys = Object.keys(RIZ);
+    var key = keys[state.rizCount % keys.length];
+    var r = RIZ[key];
+    log('⚡ RIZ: ' + key + ' · ' + r.role + ' · ' + r.drive, 'riz');
+    document.getElementById('riz-value').textContent = state.rizCount;
+}
+
+function flussStep() {
+    // Der Fluss trägt SYS3 → TEM6 → SYS9
+    if (state.cycle % 3 === 0) activateLayer('SYS3');
+    if (state.cycle % 3 === 1) activateLayer('TEM6');
+    if (state.cycle % 3 === 2) activateLayer('SYS9');
+    if (state.cycle % 5 === 0) rizStep();
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function render() {
+    ctx.clearRect(0, 0, W, H);
+
+    var grad = ctx.createRadialGradient(cx, cy, 10, cx, cy, W * 0.6);
+    grad.addColorStop(0, '#0a0a1a');
+    grad.addColorStop(1, '#000');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    drawFluss();
+    drawSYS3();
+    drawTEM6();
+    drawSYS9();
+    drawRIZ();
+
+    state.t += 0.008;
+    if (state.running) {
+        state.cycle++;
+        flussStep();
+        document.getElementById('cycle-display').textContent = 'FLUSS ' + state.cycle;
+    }
+
+    requestAnimationFrame(render);
+}
+render();
+
+// ============================================================
+// ZEICHEN-FUNKTIONEN
+// ============================================================
+
+function drawFluss() {
+    var r = radius * 0.75;
+
+    // Fluss-Ring
+    ctx.strokeStyle = 'rgba(255,215,61,0.03)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 8]);
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Fluss-Wellen
+    for (var i = 0; i < 12; i++) {
+        var angle = (i / 12) * Math.PI * 2 + state.t * 0.02;
+        var dist = r * (0.85 + Math.sin(state.t + i * 0.5) * 0.05);
+        var x = cx + Math.cos(angle) * dist;
+        var y = cy + Math.sin(angle) * dist;
+        ctx.fillStyle = 'rgba(255,215,61,0.02)';
+        ctx.beginPath();
+        ctx.arc(x, y, 1.5 + Math.sin(state.t + i) * 0.5, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    ctx.fillStyle = 'rgba(255,215,61,0.03)';
+    ctx.font = '6px Consolas';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText('🌊 SYS · 3-6-9 FLUSS', cx, cy - r * 0.85);
+}
+
+function drawSYS3() {
+    var r = radius * 0.25;
+    var angle = state.t * 0.05;
+
+    // IN
+    var x1 = cx + Math.cos(angle) * r * 0.8;
+    var y1 = cy + Math.sin(angle) * r * 0.8;
+    ctx.fillStyle = 'rgba(255,107,107,0.15)';
+    ctx.shadowColor = '#ff6b6b';
+    ctx.shadowBlur = 8;
+    ctx.beginPath();
+    ctx.arc(x1, y1, 8, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#ff6b6b';
+    ctx.font = '5px Consolas';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText('IN', x1, y1 - 10);
+
+    // CORE
+    var x2 = cx + Math.cos(angle + 2.094) * r * 0.8;
+    var y2 = cy + Math.sin(angle + 2.094) * r * 0.8;
+    ctx.fillStyle = 'rgba(255,107,107,0.15)';
+    ctx.shadowColor = '#ff6b6b';
+    ctx.shadowBlur = 8;
+    ctx.beginPath();
+    ctx.arc(x2, y2, 8, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#ff6b6b';
+    ctx.fillText('CORE', x2, y2 - 10);
+
+    // OUT
+    var x3 = cx + Math.cos(angle + 4.188) * r * 0.8;
+    var y3 = cy + Math.sin(angle + 4.188) * r * 0.8;
+    ctx.fillStyle = 'rgba(255,107,107,0.15)';
+    ctx.shadowColor = '#ff6b6b';
+    ctx.shadowBlur = 8;
+    ctx.beginPath();
+    ctx.arc(x3, y3, 8, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#ff6b6b';
+    ctx.fillText('OUT', x3, y3 - 10);
+
+    // Verbindungen
+    ctx.strokeStyle = 'rgba(255,107,107,0.1)';
+    ctx.lineWidth = 0.5;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x2, y2);
+    ctx.lineTo(x3, y3);
+    ctx.stroke();
+
+    ctx.fillStyle = 'rgba(255,107,107,0.05)';
+    ctx.font = '4px Consolas';
+    ctx.textBaseline = 'top';
+    ctx.fillText('SYS3', cx - 12, cy + r + 10);
+}
+
+function drawTEM6() {
+    var r = radius * 0.45;
+    var angle = state.t * 0.03;
+
+    // TET (+T) – grün
+    var tetColors = ['#6bff6b', '#4f4', '#2a2'];
+    var tetLabels = ['ESSO', 'ROLLER', 'KASSE'];
+    for (var i = 0; i < 3; i++) {
+        var a = angle + (i / 3) * Math.PI * 2;
+        var x = cx + Math.cos(a) * r * 0.6;
+        var y = cy + Math.sin(a) * r * 0.6;
+        ctx.fillStyle = tetColors[i] + '33';
+        ctx.shadowColor = tetColors[i];
+        ctx.shadowBlur = 4;
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = tetColors[i];
+        ctx.font = '4px Consolas';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText(tetLabels[i], x, y - 6);
+    }
+
+    // RIZ (-T) – gelb
+    var rizColors = ['#ffd93d', '#ff8c00', '#ff6b00'];
+    var rizLabels = ['DOOR', 'DOO', 'SHELL'];
+    for (var i = 0; i < 3; i++) {
+        var a = angle + (i / 3) * Math.PI * 2 + 0.5;
+        var x = cx + Math.cos(a) * r * 0.6;
+        var y = cy + Math.sin(a) * r * 0.6;
+        ctx.fillStyle = rizColors[i] + '33';
+        ctx.shadowColor = rizColors[i];
+        ctx.shadowBlur = 4;
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = rizColors[i];
+        ctx.font = '4px Consolas';
+        ctx.textBaseline = 'top';
+        ctx.fillText(rizLabels[i], x, y + 6);
+    }
+
+    ctx.fillStyle = 'rgba(107,255,107,0.05)';
+    ctx.font = '4px Consolas';
+    ctx.textBaseline = 'top';
+    ctx.fillText('TEM6', cx - 12, cy + r + 10);
+}
+
+function drawSYS9() {
+    var r = radius * 0.6;
+    var size = 6;
+    var spacing = radius * 0.035;
+    var offset = (size - 1) * spacing / 2;
+
+    var pos = state.gridPos % 81;
+    var activeRow = Math.floor(pos / 9);
+    var activeCol = pos % 9;
+
+    for (var row = 0; row < size; row++) {
+        for (var col = 0; col < size; col++) {
+            var x = cx - offset + col * spacing;
+            var y = cy - offset + row * spacing;
+            var isActive = row === activeRow && col === activeCol;
+            ctx.fillStyle = isActive ? 'rgba(107,107,255,0.3)' : 'rgba(255,255,255,0.02)';
+            ctx.shadowColor = isActive ? '#6b6bff' : 'transparent';
+            ctx.shadowBlur = isActive ? 8 : 0;
+            ctx.fillRect(x - 2, y - 2, 4, 4);
+            ctx.shadowBlur = 0;
+            if (isActive) {
+                ctx.strokeStyle = 'rgba(107,107,255,0.2)';
+                ctx.lineWidth = 0.5;
+                ctx.strokeRect(x - 3, y - 3, 6, 6);
+            }
+        }
+    }
+
+    ctx.fillStyle = 'rgba(107,107,255,0.05)';
+    ctx.font = '4px Consolas';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText('SYS9 · 9×9', cx, cy + radius * 0.5 + 10);
+}
+
+function drawRIZ() {
+    var r = radius * 0.08;
+    var riz = state.rizCount % 3;
+    var colors = ['#ffd93d', '#ff8c00', '#ff6b00'];
+    var labels = ['DOOR', 'DOO', 'SHELL'];
+
+    ctx.fillStyle = colors[riz] + '44';
+    ctx.shadowColor = colors[riz];
+    ctx.shadowBlur = 15;
+    ctx.beginPath();
+    ctx.arc(cx + r * 1.5, cy - r * 1.5, r * 0.6, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    ctx.fillStyle = colors[riz];
+    ctx.font = '5px Consolas';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('⚡', cx + r * 1.5, cy - r * 1.5);
+
+    ctx.fillStyle = '#444';
+    ctx.font = '3px Consolas';
+    ctx.textBaseline = 'top';
+    ctx.fillText(labels[riz], cx + r * 1.5, cy - r * 1.5 + 6);
+}
+
+// ============================================================
+// CONTROLS
+// ============================================================
+document.getElementById('btn-start').onclick = function() {
+    state.running = !state.running;
+    this.textContent = state.running ? '⏸ STOP' : '▶ START';
+    document.getElementById('state-display').textContent = state.running ? '● läuft' : '● gestoppt';
+    document.getElementById('state-display').style.color = state.running ? 'var(--gold)' : '#666';
+    log(state.running ? '▶ FLUSS gestartet' : '⏸ FLUSS gestoppt', 'fluss');
+};
+
+document.getElementById('btn-sys3').onclick = function() { activateLayer('SYS3'); };
+document.getElementById('btn-tem6').onclick = function() { activateLayer('TEM6'); };
+document.getElementById('btn-sys9').onclick = function() { activateLayer('SYS9'); };
+document.getElementById('btn-riz').onclick = function() { rizStep(); };
+
+document.getElementById('btn-reset').onclick = function() {
+    state.running = false;
+    state.cycle = 0;
+    state.t = 0;
+    state.sys3Count = 0;
+    state.tem6Count = 0;
+    state.sys9Count = 0;
+    state.rizCount = 0;
+    state.gridPos = 0;
+    document.getElementById('btn-start').textContent = '▶ START';
+    document.getElementById('state-display').textContent = '● reset';
+    document.getElementById('state-display').style.color = '#f44';
+    document.getElementById('cycle-display').textContent = 'FLUSS 0';
+    document.getElementById('sys3-value').textContent = '●';
+    document.getElementById('tem6-value').textContent = '0';
+    document.getElementById('sys9-value').textContent = '0';
+    document.getElementById('riz-value').textContent = '0';
+    var els = document.querySelectorAll('.layer');
+    for (var i = 0; i < els.length; i++) {
+        els[i].classList.remove('active');
+    }
+    document.querySelector('.layer[data-layer="SYS3"]').classList.add('active');
+    log('⟲ RESET — FLUSS zurückgesetzt', 'fluss');
+};
+
+document.getElementById('btn-auto').onclick = function() {
+    state.autoMode = !state.autoMode;
+    this.textContent = state.autoMode ? '⏸ PAUSE' : '▶ AUTO';
+    if (state.autoMode) {
+        state.running = true;
+        document.getElementById('btn-start').textContent = '⏸ STOP';
+        document.getElementById('state-display').textContent = '● auto';
+        document.getElementById('state-display').style.color = 'var(--gold)';
+        if (window.autoInterval) clearInterval(window.autoInterval);
+        window.autoInterval = setInterval(function() {
+            var layers = ['SYS3', 'TEM6', 'SYS9'];
+            var idx = Math.floor(Math.random() * layers.length);
+            activateLayer(layers[idx]);
+            if (Math.random() > 0.6) rizStep();
+            log('🔄 ' + layers[idx] + ' · FLUSS ' + state.cycle, 'fluss');
+        }, 3000);
+        log('▶ AUTO · FLUSS fließt', 'fluss');
+    } else {
+        clearInterval(window.autoInterval);
+        log('⏸ AUTO pausiert', 'fluss');
+    }
+};
+
+// ============================================================
+// LAYER-KLICKS
+// ============================================================
+var layerEls = document.querySelectorAll('.layer');
+for (var i = 0; i < layerEls.length; i++) {
+    layerEls[i].onclick = function() {
+        var key = this.getAttribute('data-layer');
+        activateLayer(key);
+    };
+}
+
+// ============================================================
+// TASTATUR
+// ============================================================
+document.addEventListener('keydown', function(e) {
+    if (e.key === ' ') { e.preventDefault(); document.getElementById('btn-start').click(); }
+    if (e.key === '1') activateLayer('SYS3');
+    if (e.key === '2') activateLayer('TEM6');
+    if (e.key === '3') activateLayer('SYS9');
+    if (e.key === '4') rizStep();
+    if (e.key === 'x') document.getElementById('btn-reset').click();
+    if (e.key === 'a') document.getElementById('btn-auto').click();
+});
+
+// ============================================================
+// UHR
+// ============================================================
+function updateClock() {
+    document.getElementById('clock').textContent = '⏱️ ' + new Date().toLocaleTimeString();
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ============================================================
+// INIT
+// ============================================================
+log('🌊 SYS · 3-6-9 · Struktur Root', 'fluss');
+log('◈ SYS3: IN · CORE · OUT', 'sys3');
+log('🌀 TEM6: TET (+T) · RIZ (-T)', 'tem6');
+log('▣ SYS9: 9×9 NC-Engine', 'sys9');
+log('⌨️  1=SYS3 2=TEM6 3=SYS9 4=RIZ  x=Reset  a=Auto', 'fluss');
+
+setTimeout(function() {
+    state.running = true;
+    document.getElementById('btn-start').textContent = '⏸ STOP';
+    document.getElementById('state-display').textContent = '● läuft';
+    document.getElementById('state-display').style.color = 'var(--gold)';
+    log('▶ FLUSS automatisch gestartet · 🌊', 'fluss');
+}, 500);
 </script>
-
-<hr>
-
-<h2>SYS Analyse – SYS.lyc.js</h2>
-<pre>
-score()
-modeFromScore()
-evaluate()
-</pre>
-
-<hr>
-
-<h2>NC – SYS9 Engine</h2>
-<pre id="nc-info">Lade NC.9y9.json…</pre>
-
-<script>
-fetch("NC.9y9.json")
-    .then(r => r.json())
-    .then(data => {
-        document.getElementById("nc-info").innerText =
-            JSON.stringify(data, null, 4);
-    })
-    .catch(() => {
-        document.getElementById("nc-info").innerText =
-            "Fehler: NC.9y9.json konnte nicht geladen werden.";
-    });
-</script>
-
-<hr>
-
-<h2>Host‑Hub Panel</h2>
-<div id="hh-panel">Lade Routing…</div>
-
 </body>
 </html>
