@@ -8,4 +8,3 @@ export const DOO = {
     diag: "S→S",
     status: "aktiv"
 };
-
