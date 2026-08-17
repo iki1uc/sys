@@ -8,4 +8,3 @@ export const SHELL = {
     diag: "S→W",
     status: "aktiv"
 };
-
