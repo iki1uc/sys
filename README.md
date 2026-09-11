@@ -113,4 +113,16 @@ STRUCTURE = ACTIVE
 - **[SYS3 erweitern](ca://s?q=SYS3_erweitern)**  
 - **[SYS9 stabilisieren](ca://s?q=SYS9_stabilisieren)**  
 - **[RIZ‑Engine optimieren](ca://s?q=RIZ_engine_opt)**  
-- **[window.SYS erweitern](ca://s?q=window_SYS_erweitern)**  
+- **[window.SYS erweitern](ca://s?q=window_SYS_erweitern)**
+
+- Dieses Projekt ist urheberrechtlich geschützt.
+
+Kein Clone. Kein Fork. Keine Nutzung. Keine Weitergabe.
+
+Alle Rechte liegen bei wieimmer iki1uc.
+
+@iki1uc
+Security Policy
+Dieses Projekt akzeptiert keine externen Beiträge, Analysen oder Sicherheitsmeldungen.
+
+Alle Rechte liegen bei iki1uc.
