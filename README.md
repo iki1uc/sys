@@ -115,6 +115,8 @@ STRUCTURE = ACTIVE
 - **[RIZ‑Engine optimieren](ca://s?q=RIZ_engine_opt)**  
 - **[window.SYS erweitern](ca://s?q=window_SYS_erweitern)**
 
+
+LICENSE.md
 - Dieses Projekt ist urheberrechtlich geschützt.
 
 Kein Clone. Kein Fork. Keine Nutzung. Keine Weitergabe.
