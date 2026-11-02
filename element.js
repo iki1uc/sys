@@ -1,3 +1,13 @@
 <script type="importmap">
-{ "imports": { "./ram.disk.xport": "./ram.disk.xport.js", "./rom.disk.xport": "./rom.disk.xport.js" } }
+{
+  "imports": {
+    "./ram.disk": "./ram.disk.js",
+    "./rom.disk": "./rom.disk.js",
+    "./atom": "./atom.js",
+    "./atom.mic": "./atom.mic.js",
+    "./co2.h.2.o": "./co2.h.2.o.js",
+    "./element": "./element.js",
+    "./umstand": "./umstand.js"
+  }
+}
 </script>
