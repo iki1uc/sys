@@ -2,12 +2,20 @@
 {
   "imports": {
     "./ram.disk": "./ram.disk.js",
+    "./ram.cpu": "./ram.cpu",
+    "./ram.gpu": "./ram.gpu",
+    "./ram.sys": "./ram.sys",
+    "./ram.rom": "./ram.rom",
+    "./ram.x": "./ram.x",
+    "./ram.y": "./ram.y",
+    "./ram.z": "./ram.z",
     "./rom.disk": "./rom.disk.js",
+    "./rom.disk.xport": "./ram.disk.js",
+    "./ram.disk.xport": "./ram.disk.js",
     "./atom": "./atom.js",
     "./atom.mic": "./atom.mic.js",
-    "./co2.h.2.o": "./co2.h.2.o.js",
-    "./element": "./element.js",
-    "./umstand": "./umstand.js"
+    "./co2": "./co2.h.2.o.js",
+    "./element": "./element.js"
   }
 }
 </script>
