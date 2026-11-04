@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WURZEL.INDEX v3 — net.ter + link.ker + pyramiden</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#05070d;--panel:#0a0f19;--panel2:#050912;--line:#243044;
+    --fg:#e6eaf2;--mu:#7f8ca3;--dim:#6b7a93;
+    --cyan:#00e5ff;--gold:#ffd700;--pink:#ff2d9a;--violet:#a78bfa;
+    --ok:#4dff9b;--bad:#ff5974;--green:#00FF41;
+    --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  }
+  body{background:var(--bg);color:var(--fg);font-family:var(--mono);font-size:12px;line-height:1.5;min-height:100vh}
+  #app{max-width:1080px;margin:0 auto;padding:12px}
+  /* Header */
+  .hdr{border:1px solid var(--line);border-radius:16px;padding:14px 18px;
+    background:linear-gradient(180deg,rgba(14,20,34,.95),rgba(10,15,25,.92));
+    margin-bottom:10px;display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center}
+  .hdr h1{font-family:Syne,system-ui,sans-serif;font-weight:800;font-size:22px;letter-spacing:.12em;color:var(--gold);line-height:1}
+  .hdr .sub{font-size:10px;color:var(--dim);letter-spacing:.18em;margin-top:4px}
+  .hdr .sub2{font-size:10px;color:var(--mu);margin-top:4px}
+  .chips{display:flex;flex-wrap:wrap;gap:5px}
+  .chip{padding:3px 9px;border-radius:999px;border:1px solid var(--line);background:var(--panel2);
+    font-size:10px;letter-spacing:.04em;color:var(--dim);white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
+  .chip.gold{color:var(--gold);border-color:rgba(255,215,0,.4);background:rgba(255,215,0,.06)}
+  .chip.cyan{color:var(--cyan);border-color:rgba(0,229,255,.4);background:rgba(0,229,255,.06)}
+  .chip.pink{color:var(--pink);border-color:rgba(255,45,154,.4);background:rgba(255,45,154,.06)}
+  .chip.violet{color:var(--violet);border-color:rgba(167,139,250,.4);background:rgba(167,139,250,.06)}
+  .chip.ok{color:var(--ok);border-color:rgba(77,255,155,.4);background:rgba(77,255,155,.08)}
+  .chip.bad{color:var(--bad);border-color:rgba(255,89,116,.4);background:rgba(255,89,116,.08)}
+  /* Grid */
+  .grid2{display:grid;grid-template-columns:1fr;gap:10px}
+  @media(min-width:900px){.grid2{grid-template-columns:1.15fr .85fr}}
+  section{border:1px solid var(--line);border-radius:14px;padding:12px;background:var(--panel);margin-bottom:10px;position:relative;overflow:hidden}
+  section::before{content:'';position:absolute;inset:0 0 auto 0;height:1px;
+    background:linear-gradient(90deg,transparent,rgba(255,215,0,.22),rgba(0,229,255,.18),transparent)}
+  h2{font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--dim);margin-bottom:10px;
+    display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:700}
+  /* Textarea */
+  textarea{width:100%;min-height:110px;resize:vertical;background:var(--panel2);color:var(--fg);
+    border:1px solid var(--line);border-radius:10px;padding:9px 11px;
+    font-family:var(--mono);font-size:12px;line-height:1.6;outline:none}
+  textarea:focus{border-color:rgba(0,229,255,.5);box-shadow:0 0 0 3px rgba(0,229,255,.12)}
+  /* Buttons */
+  .btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  button{background:transparent;color:var(--dim);border:1px solid var(--line);
+    padding:7px 12px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;
+    cursor:pointer;border-radius:8px;transition:.18s;font-weight:600}
+  button:hover{background:rgba(255,255,255,.05);color:var(--fg);transform:translateY(-1px)}
+  button.gold{color:var(--gold);border-color:rgba(255,215,0,.5)}
+  button.gold:hover{background:rgba(255,215,0,.12)}
+  button.cyan{color:var(--cyan);border-color:rgba(0,229,255,.5)}
+  button.cyan:hover{background:rgba(0,229,255,.12)}
+  /* Status rows */
+  .status-row{display:flex;justify-content:space-between;padding:3px 0;
+    border-bottom:1px dashed rgba(36,48,68,.5);font-size:11px}
+  .status-row:last-child{border-bottom:0}
+  .status-row .k{color:var(--dim)}
+  .status-row .v{color:var(--fg);font-weight:700}
+  .v.ok{color:var(--ok)} .v.bad{color:var(--bad)} .v.gold{color:var(--gold)}
+  /* Legend */
+  .legend{display:flex;flex-wrap:wrap;gap:10px;font-size:10px;color:var(--dim);margin-top:8px}
+  .legend span{display:inline-flex;align-items:center;gap:5px}
+  .dot{width:8px;height:8px;border-radius:999px;display:inline-block}
+  /* Pre */
+  pre{background:#03050a;border:1px solid var(--line);border-radius:8px;padding:10px;
+    font-size:10px;line-height:1.5;overflow:auto;max-height:200px;color:#9fb0cc;
+    white-space:pre-wrap;word-break:break-all;margin:0}
+  /* SVG */
+  .net-wrap{background:#03050a;border:1px solid var(--line);border-radius:12px;
+    overflow:hidden;aspect-ratio:1/1;max-height:560px;display:flex;align-items:center;justify-content:center}
+  .net-wrap svg{width:100%;height:100%;display:block}
+  /* 7 Pflichten */
+  .pf-grid{display:grid;grid-template-columns:1fr;gap:6px}
+  @media(min-width:520px){.pf-grid{grid-template-columns:1fr 1fr}}
+  .pf{border:1px solid var(--line);background:linear-gradient(180deg,#080d1a,#060a14);
+    padding:8px 10px;border-radius:8px;font-size:10px;display:flex;flex-direction:column;gap:3px}
+  .pf-h{display:flex;justify-content:space-between;align-items:baseline;gap:4px}
+  .pf-n{font-weight:700;color:var(--fg);font-size:11px}
+  .pf-d{color:var(--dim);font-size:9px;line-height:1.4}
+  .pf-t{display:flex;gap:6px;font-size:9px;color:var(--dim);flex-wrap:wrap}
+  .pf-t .p{color:var(--ok)} .pf-t .f{color:var(--bad)}
+  .pf-home{font-size:9px;display:flex;gap:6px;align-items:center;margin-top:2px}
+  .pill{font-size:8px;padding:1px 6px;border-radius:999px;border:1px solid}
+  .pill.safe{color:var(--ok);border-color:rgba(77,255,155,.5);background:rgba(77,255,155,.12)}
+  .pill.break{color:var(--pink);border-color:rgba(255,45,154,.5);background:rgba(255,45,154,.12)}
+  /* Footer */
+  footer{text-align:center;font-size:9px;letter-spacing:.14em;color:var(--dim);padding:14px 0}
+  /* Kandidaten */
+  .cand{display:flex;align-items:center;justify-content:space-between;padding:5px 8px;
+    background:var(--panel2);border:1px solid var(--line);border-radius:6px;font-size:10px;margin-bottom:4px}
+  .cand.min40{border-color:rgba(167,139,250,.4);background:linear-gradient(180deg,rgba(22,18,42,.9),rgba(10,15,25,.9))}
+  .cand .label{display:flex;align-items:center;gap:6px}
+  .cand .swatch{width:14px;height:3px;border-radius:2px;display:inline-block}
+  .cand.min40 .swatch{height:4px}
+  .cand .val{color:var(--fg);font-weight:700}
+  /* Slider */
+  .slider-wrap{margin-top:10px}
+  input[type=range]{width:100%;-webkit-appearance:none;height:5px;background:#1a2538;border-radius:999px;outline:none}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;
+    background:var(--gold);border:2px solid var(--bg);box-shadow:0 0 0 3px rgba(255,215,0,.25);cursor:pointer}
+  .slider-labels{display:flex;justify-content:space-between;font-size:9px;color:var(--dim);margin-top:4px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script type="module">
+import React, { useState, useMemo, useRef } from 'react';
+import { createRoot } from 'react-dom/client';
+
+const HOME = 40;
+const N = 9;
+const PTS = [0,1,17,18,40,80,120];
+const CAND = [
+  {id:'max18', label:'max(18,x)', expr:'Math.max(18,x)', color:'#4dff9b', thick:false, fn:x=>Math.max(18,x)},
+  {id:'max0',  label:'max(0,x)',  expr:'Math.max(0,x)',  color:'#00e5ff', thick:false, fn:x=>Math.max(0,x)},
+  {id:'min40', label:'min(x,40)', expr:'Math.min(x,40)', color:'#a78bfa', thick:true,  fn:x=>Math.min(x,40)},
+  {id:'x-7',   label:'x − 7',     expr:'x-7',            color:'#ff2d9a', thick:false, fn:x=>x-7},
+  {id:'x/2',   label:'x / 2',     expr:'x/2',            color:'#ff8c42', thick:false, fn:x=>x/2},
+  {id:'sqrt',  label:'√x',        expr:'Math.sqrt(x)',   color:'#ffd700', thick:false, fn:x=>x>=0?Math.sqrt(x):x},
+  {id:'const', label:'konst 40',  expr:'()=>40',         color:'#7a7f8c', thick:false, fn:()=>40},
+];
+const PFLICHTEN = [
+  {id:'verwalten',  f:x=>x,                      note:'identity — Zustand bleibt'},
+  {id:'richten',    f:x=>Math.round(x),          note:'snap to int grid'},
+  {id:'schützen',   f:x=>Math.max(0,x),          note:'ReLU — nie negativ'},
+  {id:'zuteilen',   f:x=>Math.floor(x),          note:'int bucket'},
+  {id:'verbinden',  f:x=>Math.sign(x)*Math.min(Math.abs(x),100), note:'clamp ±100'},
+  {id:'überwachen', f:x=>Math.sign(x),           note:'direction only'},
+  {id:'entscheiden',f:x=>x>0?1:0,                note:'binary decision'},
+];
+const CAT = {
+  was:  {color:'#00e5ff', ring:100, level:'wurzel-hub', kind:'algebraisch'},
+  wie:  {color:'#ffd700', ring:200, level:'bio.tel',    kind:'textuell'},
+  warum:{color:'#ff2d9a', ring:300, level:'pyramiden',  kind:'kinetisch'},
+};
+function classify(l){
+  if(/weil|damit|regel|f\(f/.test(l)) return 'warum';
+  if(/[0-9=×*^]/.test(l)) return 'wie';
+  return 'was';
+}
+function norm(s){
+  return [...new Set(s.toLowerCase().split('\n').map(x=>x.replace(/\s+/g,' ').trim()).filter(Boolean))].join('\n');
+}
+function hashStr(s){let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))%81;return h}
+function testF2(fn){
+  let n=0,ok=0;
+  for(const x of [-2,-1,0,0.5,1,2,17,18,40,80,120,729,-729]){
+    try{const a=fn(x),b=fn(a);if(!isFinite(a)||!isFinite(b))continue;n++;if(Math.abs(a-b)<1e-9)ok++}catch{}
+  }
+  return {n,ok,pass:n>0&&ok===n};
+}
+function testInfo(fn){
+  const s=new Set(PTS.map(x=>Math.round(fn(x)*1e6)/1e6));
+  return {size:s.size, pass:s.size>1, vals:PTS.map(x=>fn(x))};
+}
+function testVerj(fn){
+  let le=true,lt=false;
+  for(let x=-10;x<=120;x+=0.5){const y=fn(x);if(y>x+1e-9){le=false;break}if(y<x-1e-9)lt=true}
+  return {pass:le&&lt};
+}
+
+const DEFAULT_INPUT = `was: das ding - wurzel-hub
+wie: 40 = 4×9+4 - bio.tel rechnet
+warum: weil f(f(x))=f(x) - regel bleibt
+was: 9 dreiecke
+wie: 9×40°=360°
+warum: damit home hält
+was: link.ker verbindet
+wie: f²=f echt geprüft
+warum: regel für netz`;
+
+function App(){
+  const [input,setInput]=useState(DEFAULT_INPUT);
+  const [xVal,setXVal]=useState(60);
+  const [copied,setCopied]=useState(false);
+  const preRef=useRef(null);
+
+  const data=useMemo(()=>{
+    const n=norm(input), lines=n?n.split('\n'):[];
+    const groups={was:[],wie:[],warum:[]};
+    for(const l of lines) groups[classify(l)].push(l);
+    const idem = norm(input)===norm(norm(input));
+
+    // Nodes: home + per group
+    const nodes=[{id:'home',kind:'home',label:'HOME 40',line:null,x:0,y:0,r:14}];
+    for(const k of ['was','wie','warum']){
+      const arr=groups[k], R=CAT[k].ring;
+      arr.forEach((line,i)=>{
+        const a=i/Math.max(1,arr.length)*Math.PI*2 - Math.PI/2;
+        nodes.push({id:`${k}-${i}`,kind:k,label:String(i+1),line,x:Math.cos(a)*R,y:Math.sin(a)*R,r:9});
+      });
+    }
+    // Edges: ring + bridge + link.ker
+    const edges=[];
+    for(const k of ['was','wie','warum']){
+      const len=groups[k].length;
+      if(len>=2) for(let i=0;i<len;i++) edges.push({from:`${k}-${i}`,to:`${k}-${(i+1)%len}`,kind:k,type:'ring'});
+      if(len>0) edges.push({from:`${k}-0`,to:'home',kind:k,type:'bridge'});
+    }
+    // link.ker: gold bridge from each level's first to home
+    const linkKer=['was','wie','warum'].filter(k=>groups[k].length>0).length;
+
+    // Payload (like Wurzel-Net-Ter-Link)
+    const missing=Object.keys(groups).filter(k=>groups[k].length===0);
+    const wurzel = missing.length===0;
+    const levelActive={ 'wurzel-hub':groups.was.length>0, 'bio.tel':groups.wie.length>0, 'pyramiden':groups.warum.length>0 };
+
+    // 7 Pflichten
+    const pflichten=PFLICHTEN.map(p=>{
+      const f2=testF2(p.f);
+      const home=p.f(HOME);
+      return {...p, f2, home, safe:home===HOME};
+    });
+    const safeCount=pflichten.filter(p=>p.safe).length;
+
+    // Kandidaten (7) + tests
+    const kandidaten=CAND.map(c=>({...c, f2:testF2(c.fn), info:testInfo(c.fn), verj:testVerj(c.fn), val:c.fn(xVal)}));
+    const abfluss=kandidaten.filter(k=>!k.f2.pass).length;
+    const brunnen=kandidaten.filter(k=>k.f2.pass&&k.info.pass).length;
+    const verjuengt=kandidaten.filter(k=>k.verj.pass).length;
+
+    // Payload
+    const payload={
+      name:'wurzel.index', v:'v3', home:HOME, n:N,
+      fixpunkt:'40 = 4·9+4 = 360/9', angles:'9×40°=360°',
+      idempotent:idem, wurzel, missing, lines:lines.length,
+      groups, levelActive, linkKer,
+      pflichten:pflichten.map(p=>({id:p.id,note:p.note,f2:p.f2.pass,home:p.home,safe:p.safe})),
+      safeCount, breakCount:7-safeCount,
+      kandidaten:kandidaten.map(k=>({id:k.id,label:k.label,f2:k.f2.pass,info:k.info.pass,verj:k.verj.pass})),
+      abfluss, brunnen, verjuengt,
+    };
+    const json=JSON.stringify(payload,null,2);
+    const bytes=new TextEncoder().encode(json).length;
+    return {n,lines,groups,idem,wurzel,missing,nodes,edges,linkKer,levelActive,payload,json,bytes,pflichten,safeCount,kandidaten,abfluss,brunnen,verjuengt};
+  },[input,xVal]);
+
+  const nodeMap=useMemo(()=>{
+    const m={}; data.nodes.forEach(n=>m[n.id]=n); return m;
+  },[data.nodes]);
+
+  const exportJSON=()=>{
+    const blob=new Blob([data.json],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download='wurzel.index.v3.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1500);
+  };
+  const copyJSON=async()=>{
+    try{ await navigator.clipboard.writeText(data.json); setCopied(true); setTimeout(()=>setCopied(false),1400);}catch{}
+  };
+
+  return React.createElement('div',{},
+    React.createElement('header',{className:'hdr'},[
+      React.createElement('div',{key:'l'},[
+        React.createElement('h1',{key:'h'},'WURZEL.INDEX v3'),
+        React.createElement('div',{key:'s',className:'sub'},'net.ter + link.ker + pyramiden'),
+        React.createElement('div',{key:'s2',className:'sub2'},'DREI EBENEN · EIN FIXPUNKT · HOME 40 · f²=f · 9×40°=360°')
+      ]),
+      React.createElement('div',{key:'r',className:'chips'},[
+        React.createElement('span',{key:'a',className:'chip gold'},'HOME 40'),
+        React.createElement('span',{key:'b',className:'chip cyan'},'9×40°=360°'),
+        React.createElement('span',{key:'c',className:'chip'},'81 · 9×9'),
+        React.createElement('span',{key:'d',className:`chip ${data.idem?'ok':'bad'}`},`f²=f ${data.idem?'✓':'✗'}`),
+        React.createElement('span',{key:'e',className:`chip ${data.wurzel?'ok':'bad'}`},data.wurzel?'3→1 WURZEL ✓':`fehlt: ${data.missing.join(', ')}`),
+        React.createElement('span',{key:'f',className:'chip violet'},'min(x,40) #a78bfa'),
+        React.createElement('span',{key:'g',className:'chip'},`${data.bytes} B payload`),
+      ])
+    ]),
+
+    React.createElement('div',{className:'grid2'},[
+      // Left column
+      React.createElement('div',{key:'L'},[
+        // Input
+        React.createElement('section',{key:'in'},[
+          React.createElement('h2',{key:'h'},[
+            React.createElement('span',{key:'a'},'EINGABE · was / wie / warum'),
+            React.createElement('span',{key:'b',style:{fontSize:9,color:'var(--dim)'}},`${data.lines.length} Zeilen`)
+          ]),
+          React.createElement('textarea',{key:'t',value:input,onChange:e=>setInput(e.target.value),
+            placeholder:'was: das ding\nwie: 40 = 4+9+4\nwarum: weil f(f(x))=f(x)'}),
+          React.createElement('div',{className:'btns',key:'b'},[
+            React.createElement('button',{key:'r',onClick:()=>setInput('')},'RESET'),
+            React.createElement('button',{key:'e',className:'gold',onClick:exportJSON},'↓ JSON'),
+            React.createElement('button',{key:'c',className:'cyan',onClick:copyJSON},copied?'COPIED ✓':'COPY'),
+          ]),
+          React.createElement('div',{className:'legend',key:'l'},[
+            React.createElement('span',{key:'a'},[React.createElement('span',{key:'d',className:'dot',style:{background:'#00e5ff'}}),'was → wurzel-hub']),
+            React.createElement('span',{key:'b'},[React.createElement('span',{key:'d',className:'dot',style:{background:'#ffd700'}}),'wie → bio.tel']),
+            React.createElement('span',{key:'c'},[React.createElement('span',{key:'d',className:'dot',style:{background:'#ff2d9a'}}),'warum → pyramiden']),
+          ])
+        ]),
+        // Network
+        React.createElement('section',{key:'net'},[
+          React.createElement('h2',{key:'h'},[
+            React.createElement('span',{key:'a'},'PYRAMIDEN-MESH · 3 Ringe → HOME 40'),
+            React.createElement('span',{key:'b',style:{fontSize:9,color:'var(--dim)'}},`${data.nodes.length} knoten · ${data.edges.length} kanten`)
+          ]),
+          React.createElement('div',{className:'net-wrap',key:'w'},
+            React.createElement('svg',{viewBox:'-400 -400 800 800',xmlns:'http://www.w3.org/2000/svg'},[
+              // 9 triangles / 9×40° (background geometry)
+              ...Array.from({length:9},(_,i)=>{
+                const a0=(i*40-90)*Math.PI/180, a1=((i+1)*40-90)*Math.PI/180;
+                const rIn=80, rOut=360;
+                return React.createElement('line',{key:`tri${i}`,
+                  x1:Math.cos(a0)*rIn,y1:Math.sin(a0)*rIn,
+                  x2:Math.cos(a1)*rOut,y2:Math.sin(a1)*rOut,
+                  stroke:'rgba(0,229,255,0.08)',strokeWidth:0.8});
+              }),
+              // Three rings
+              ...['was','wie','warum'].map(k=>
+                React.createElement('circle',{key:`ring${k}`,cx:0,cy:0,r:CAT[k].ring,
+                  fill:'none',stroke:CAT[k].color,strokeOpacity:0.18,strokeDasharray:'3 6',strokeWidth:0.8})
+              ),
+              // Edges
+              ...data.edges.map((e,i)=>{
+                const a=nodeMap[e.from],b=nodeMap[e.to];
+                if(!a||!b) return null;
+                const isBridge=e.type==='bridge';
+                const col=CAT[e.kind].color;
+                return React.createElement('line',{key:`e${i}`,
+                  x1:a.x,y1:a.y,x2:b.x,y2:b.y,
+                  stroke:col,strokeOpacity:isBridge?0.75:0.35,
+                  strokeWidth:isBridge?2:1.1,
+                  strokeDasharray:isBridge?undefined:'4 4'});
+              }),
+              // Nodes
+              ...data.nodes.map(n=>{
+                if(n.kind==='home') return React.createElement('g',{key:n.id},[
+                  React.createElement('circle',{key:'o',cx:0,cy:0,r:22,fill:'#ffd700',opacity:0.12}),
+                  React.createElement('circle',{key:'c',cx:0,cy:0,r:14,fill:'#ffd700',stroke:'#fff',strokeWidth:1.5}),
+                  React.createElement('text',{key:'t',x:0,y:4,textAnchor:'middle',fontFamily:'JetBrains Mono,monospace',fontSize:10,fontWeight:700,fill:'#05070d'},'40'),
+                  React.createElement('text',{key:'l',x:0,y:-24,textAnchor:'middle',fontFamily:'JetBrains Mono,monospace',fontSize:9,fill:'#ffd700',letterSpacing:2},'HOME')
+                ]);
+                const col=CAT[n.kind].color;
+                const h=hashStr(n.line||'');
+                return React.createElement('g',{key:n.id},[
+                  React.createElement('circle',{key:'o',cx:n.x,cy:n.y,r:n.r+5,fill:col,opacity:0.08}),
+                  React.createElement('circle',{key:'c',cx:n.x,cy:n.y,r:n.r,fill:col,fillOpacity:0.92,stroke:col,strokeWidth:1.2}),
+                  React.createElement('text',{key:'t',x:n.x,y:n.y+3,textAnchor:'middle',fontFamily:'JetBrains Mono,monospace',fontSize:8,fontWeight:700,fill:'#05070d'},n.label),
+                  React.createElement('title',{key:'ti'},`cell ${h} · ${n.line||''}`)
+                ]);
+              })
+            ])
+          ),
+          React.createElement('div',{className:'legend',key:'l'},[
+            React.createElement('span',{key:'a'},`was ${data.groups.was.length}`),
+            React.createElement('span',{key:'b'},`wie ${data.groups.wie.length}`),
+            React.createElement('span',{key:'c'},`warum ${data.groups.warum.length}`),
+            React.createElement('span',{key:'d'},`link.ker ${data.linkKer}/3`),
+            React.createElement('span',{key:'e',style:{marginLeft:'auto'}},'center 0,0 · R 100/200/300'),
+          ])
+        ])
+      ]),
+
+      // Right column
+      React.createElement('div',{key:'R'},[
+        // Status
+        React.createElement('section',{key:'st'},[
+          React.createElement('h2',{key:'h'},'STATUS · net.ter + link.ker'),
+          ...[
+            ['was',data.groups.was.length,data.groups.was.length?'ok':'bad'],
+            ['wie',data.groups.wie.length,data.groups.wie.length?'ok':'bad'],
+            ['warum',data.groups.warum.length,data.groups.warum.length?'ok':'bad'],
+            ['knoten',data.nodes.length,''],
+            ['kanten',data.edges.length,''],
+            ['link.ker',`${data.linkKer}/3`,data.linkKer===3?'ok':''],
+            ['f²=f',data.idem?'✓ idempotent':'✗ nicht idempotent',data.idem?'ok':'bad'],
+            ['wurzel',data.wurzel?'✓ 3→1':`✗ fehlt ${data.missing.join(', ')}`,data.wurzel?'ok':'bad'],
+            ['HOME',`${HOME} = 4·9+4 = 360/9`,'gold'],
+          ].map(([k,v,cls])=>
+            React.createElement('div',{key:k,className:'status-row'},[
+              React.createElement('span',{key:'k',className:'k'},k),
+              React.createElement('span',{key:'v',className:`v ${cls}`},v)
+            ])
+          )
+        ]),
+        // 7 Pflichten
+        React.createElement('section',{key:'pf'},[
+          React.createElement('h2',{key:'h'},[
+            React.createElement('span',{key:'a'},'7 PFLICHTEN'),
+            React.createElement('span',{key:'b',style:{fontSize:9}},
+              React.createElement('span',{key:'s',style:{color:'var(--ok)'}},`${data.safeCount}/7 SAFE`),
+              ' · ',
+              React.createElement('span',{key:'b',style:{color:'var(--pink)'}},`${7-data.safeCount}/7 BREAK`))
+          ]),
+          React.createElement('div',{className:'pf-grid',key:'g'},
+            ...data.pflichten.map(p=>
+              React.createElement('div',{key:p.id,className:'pf'},[
+                React.createElement('div',{key:'h',className:'pf-h'},[
+                  React.createElement('span',{key:'n',className:'pf-n'},p.id),
+                  React.createElement('span',{key:'f',style:{fontSize:9,color:p.f2.pass?'var(--ok)':'var(--bad)'}},p.f2.pass?'✓':'✗')
+                ]),
+                React.createElement('div',{key:'d',className:'pf-d'},p.note),
+                React.createElement('div',{key:'t',className:'pf-t'},[
+                  React.createElement('span',{key:'a',className:p.f2.pass?'p':'f'},`f²=f ${p.f2.ok}/${p.f2.n}`),
+                  React.createElement('span',{key:'b',className:p.safe?'p':'f'},`HOME ${p.home}`),
+                ]),
+                React.createElement('div',{key:'h2',className:'pf-home'},[
+                  React.createElement('span',{key:'s',className:`pill ${p.safe?'safe':'break'}`},p.safe?'SAFE':'BREAK')
+                ])
+              ])
+            )
+          )
+        ]),
+        // Kandidaten
+        React.createElement('section',{key:'kd'},[
+          React.createElement('h2',{key:'h'},[
+            React.createElement('span',{key:'a'},'7 KANDIDATEN · f²=f / Info / verjüngt'),
+            React.createElement('span',{key:'b',style:{fontSize:9}},`${data.abfluss}/7 Abfluss · ${data.brunnen}/7 Brunnen · ${data.verjuengt}/7 verjüngt`)
+          ]),
+          ...data.kandidaten.map(k=>
+            React.createElement('div',{key:k.id,className:`cand ${k.id==='min40'?'min40':''}`},[
+              React.createElement('span',{key:'l',className:'label'},[
+                React.createElement('span',{key:'s',className:'swatch',style:{background:k.color}}),
+                React.createElement('span',{key:'t'},k.label)
+              ]),
+              React.createElement('span',{key:'v',className:'val',style:{color:k.color}},isFinite(k.val)?k.val.toFixed(k.val%1?2:0):'NaN'),
+              React.createElement('span',{key:'b',style:{display:'flex',gap:4,fontSize:9}},
+                React.createElement('span',{key:'f2',className:k.f2.pass?'p':'f'},k.f2.pass?'f²✓':'f²✗'),
+                React.createElement('span',{key:'in',className:k.info.pass?'p':'f'},k.info.pass?'I✓':'I✗'),
+                React.createElement('span',{key:'vj',className:k.verj.pass?'p':'f'},k.verj.pass?'V✓':'V—')
+              )
+            ])
+          ),
+          React.createElement('div',{className:'slider-wrap',key:'sl'},[
+            React.createElement('div',{key:'v',style:{display:'flex',justifyContent:'space-between',fontSize:11,marginBottom:4}},
+              React.createElement('span',{key:'a'},`x = ${xVal}`),
+              React.createElement('span',{key:'b',style:{color:'var(--dim)',fontSize:9}},'Start 60 → min(x,40) sichtbar ab 41')
+            ),
+            React.createElement('input',{key:'r',type:'range',min:0,max:120,value:xVal,
+              onChange:e=>setXVal(parseInt(e.target.value))}),
+            React.createElement('div',{key:'l',className:'slider-labels'},[
+              React.createElement('span',{key:'a'},'0'),
+              React.createElement('span',{key:'b'},'40 HOME'),
+              React.createElement('span',{key:'c'},'60 START'),
+              React.createElement('span',{key:'d'},'80'),
+              React.createElement('span',{key:'e'},'120'),
+            ])
+          ])
+        ]),
+        // Export
+        React.createElement('section',{key:'ex'},[
+          React.createElement('h2',{key:'h'},'EXPORT · wurzel.index.v3.json'),
+          React.createElement('pre',{key:'p',ref:preRef},data.json)
+        ])
+      ])
+    ]),
+
+    React.createElement('footer',{},`WURZEL.INDEX v3 · net.ter + link.ker + pyramiden · HOME 40 · f²=f · 9×40°=360° · min(x,40) #a78bfa · ${data.lines.length} Zeilen · ${data.bytes} bytes`)
+  );
+}
+
+createRoot(document.getElementById('app')).render(React.createElement(App));
+</script>
+</body>
+</html>
